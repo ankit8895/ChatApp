@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
-import Messages from './components/Messages';
 import { io } from 'socket.io-client';
 
 const user_list = ['Alan', 'Bob', 'Carol', 'Dean', 'Elin'];
-const socket = io('http://localhost:4000');
+const socket = io('http://localhost:4000', { transports: ['websocket'] });
 
 const App = () => {
   const [message, setMessage] = useState('');
@@ -48,9 +47,53 @@ const App = () => {
   return (
     <div className='flex-1 p:2 sm:p-6 justify-between flex flex-col h-screen font-sans'>
       <Header />
-      {messages.map(({ id, user, text, likes }) => (
-        <Messages key={id} text={text} likeMessage={likeMessage} />
-      ))}
+      <div
+        id='messages'
+        className='flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch'
+      >
+        {messages.map(({ id, user, text, likes }) => (
+          <div className='chat-message'>
+            <div className='flex items-end'>
+              <div className='flex flex-col space-y-2 text-sm max-w-xs mx-2 order-2 items-start'>
+                <div className='relative flex-grow'>
+                  <span
+                    className={`px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600 ${
+                      user === 'Alan' && 'border-red-500'
+                    } ${user === 'Bob' && 'border-green-500'} ${
+                      user === 'Carol' && 'border-pink-500'
+                    } ${user === 'Dean' && 'border-orange-500'} ${
+                      user === 'Elin' && 'border-yellow-500'
+                    }`}
+                  >
+                    {text}
+                  </span>
+                  <button
+                    className='absolute -bottom-6 right-0 text-xs'
+                    onClick={() => likeMessage(id)}
+                  >
+                    ❤️
+                    {likes}
+                  </button>
+                </div>
+                <div>
+                  <p className='text-xs'>{user}</p>
+                </div>
+              </div>
+              <div
+                className={`w-9 h-9 rounded-full order-1 uppercase border flex justify-center items-center text-white font-semibold ${
+                  user === 'Alan' && 'bg-red-500'
+                } ${user === 'Bob' && 'bg-green-500'} ${
+                  user === 'Carol' && 'bg-pink-500'
+                } ${user === 'Dean' && 'bg-orange-500'} ${
+                  user === 'Elin' && 'bg-yellow-500'
+                }`}
+              >
+                {user.substring(0, 2)}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
 
       <div className='border-t-2 border-gray-200 px-4 pt-4 mb-2 sm:mb-0'>
         <div className='relative flex'>
